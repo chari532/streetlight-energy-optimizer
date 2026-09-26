@@ -1,914 +1,454 @@
-\# 💡 Streetlight Energy Optimizer
+# 💡 Streetlight Energy Optimizer
 
+An AI/ML-based project that predicts **streetlight energy consumption** and provides **lighting optimization recommendations** to help reduce unnecessary electricity usage.
 
+The project uses real-world smart streetlight energy meter data and machine learning techniques to analyze consumption patterns and predict energy demand.
 
-An end-to-end Machine Learning project that predicts streetlight energy consumption and identifies periods where lighting could potentially be reduced or dimmed to improve energy efficiency.
+---
 
+## 🚀 Project Overview
 
+Street lighting consumes a significant amount of electricity, especially when lighting operates at full intensity during periods of lower demand.
 
-\## 📌 Project Overview
+This project aims to:
 
+* 📊 Analyze streetlight energy consumption patterns
+* 🤖 Predict energy consumption using Machine Learning
+* 💡 Identify high-energy consumption periods
+* ⚡ Provide lighting optimization recommendations
+* 📈 Visualize energy consumption trends
+* 🌐 Provide an interactive Streamlit application
 
+---
 
-Streetlights consume significant amounts of electricity, and their energy usage varies depending on factors such as time of day, day of the month, month, weekday/weekend patterns, and individual streetlight devices.
+## 🎯 Objectives
 
+1. Collect and preprocess smart streetlight energy meter data.
+2. Perform Exploratory Data Analysis (EDA).
+3. Create useful time-based and cyclic features.
+4. Build Machine Learning models for energy prediction.
+5. Compare Linear Regression and Random Forest models.
+6. Analyze feature importance.
+7. Generate lighting optimization recommendations.
+8. Deploy an interactive prediction application using Streamlit.
 
+---
 
-This project uses historical streetlight energy-meter data to:
+## 📂 Dataset
 
-
-
-\* Clean and preprocess energy-meter readings
-
-\* Calculate hourly energy consumption
-
-\* Perform feature engineering
-
-\* Train and compare Machine Learning models
-
-\* Predict streetlight energy consumption
-
-\* Identify high-consumption periods
-
-\* Generate Reduce/DIM lighting recommendations
-
-\* Estimate potential energy savings under a defined reduction scenario
-
-\* Deploy the Machine Learning model through a Streamlit web application
-
-
-
-\---
-
-
-
-\## 🎯 Project Objective
-
-
-
-The main objective is to build a Machine Learning system that can help identify periods of higher streetlight energy consumption and provide an automated recommendation for potential lighting optimization.
-
-
-
-\### Workflow
-
-
-
-```text
-
-Streetlight Energy Data
-
-&#x20;       ↓
-
-Data Cleaning
-
-&#x20;       ↓
-
-Energy Consumption Calculation
-
-&#x20;       ↓
-
-Feature Engineering
-
-&#x20;       ↓
-
-Exploratory Data Analysis
-
-&#x20;       ↓
-
-Machine Learning
-
-&#x20;       ↓
-
-Model Evaluation
-
-&#x20;       ↓
-
-Energy Optimization
-
-&#x20;       ↓
-
-Streamlit Application
-
-```
-
-
-
-\---
-
-
-
-\## 📊 Dataset
-
-
-
-The project uses the \*\*SmartLivingEPC Public Street Lighting dataset\*\* containing energy-meter measurements from multiple streetlight devices.
-
-
+The project uses the **Zenodo SmartLivingEPC Public Street Lighting dataset**.
 
 Dataset source:
 
+🔗 https://zenodo.org/records/15781077
 
+The dataset contains smart streetlight energy meter readings from multiple devices.
 
-\[Zenodo — SmartLivingEPC Public Street Lighting Dataset](https://zenodo.org/records/15781077?utm\_source=chatgpt.com)
-
-
-
-\### Dataset characteristics
-
-
-
-\* \*\*4 streetlight devices\*\*
-
-\* \*\*4,958 raw records\*\*
-
-\* Energy measurements in \*\*kWh\*\*
-
-\* Timestamp-based measurements
-
-\* Device-specific energy-meter readings
-
-
-
-\### Main columns
-
-
+### Dataset columns
 
 | Column      | Description                          |
-
 | ----------- | ------------------------------------ |
-
-| `device\_id` | Unique streetlight device identifier |
-
+| `device_id` | Unique streetlight/device identifier |
 | `timestamp` | Date and time of measurement         |
-
-| `meas\_type` | Measurement type                     |
-
-| `value`     | Energy-meter reading                 |
-
+| `meas_type` | Measurement type                     |
+| `value`     | Energy meter reading                 |
 | `unit`      | Measurement unit                     |
 
+### Dataset processing
 
+The raw dataset contains cumulative meter readings. Energy consumption was calculated using changes between consecutive meter readings for each device.
 
-\---
+Negative meter changes caused by meter resets or corrections were removed from the consumption calculation.
 
+---
 
-
-\## 🧹 Data Preprocessing
-
-
-
-The raw energy-meter readings were processed before Machine Learning.
-
-
-
-\### Steps performed
-
-
-
-1\. Loaded multiple CSV files
-
-2\. Combined the individual device datasets
-
-3\. Converted timestamps into datetime format
-
-4\. Sorted data by device and timestamp
-
-5\. Calculated changes between consecutive meter readings
-
-6\. Identified negative meter changes caused by resets/corrections
-
-7\. Removed invalid/missing consumption values
-
-8\. Detected abnormal energy-consumption values using the IQR method
-
-9\. Created a cleaned dataset
-
-
-
-After cleaning:
-
-
+## 🔄 Machine Learning Workflow
 
 ```text
-
-Cleaned records: 4,814
-
-```
-
-
-
-\---
-
-
-
-\## ⚙️ Feature Engineering
-
-
-
-The following features were created:
-
-
-
-\### Time-based features
-
-
-
-\* `hour`
-
-\* `day`
-
-\* `month`
-
-\* `day\_of\_week`
-
-\* `is\_weekend`
-
-
-
-\### Cyclic time features
-
-
-
-To represent the cyclical nature of hours and months:
-
-
-
-\* `hour\_sin`
-
-\* `hour\_cos`
-
-\* `month\_sin`
-
-\* `month\_cos`
-
-
-
-\### Target variable
-
-
-
-```text
-
-energy\_consumption
-
-```
-
-
-
-The target was calculated from the change in consecutive energy-meter readings.
-
-
-
-\---
-
-
-
-\## 🤖 Machine Learning Models
-
-
-
-Three regression approaches were evaluated.
-
-
-
-\### 1. Linear Regression
-
-
-
-Used as a baseline model.
-
-
-
-\### 2. Random Forest Regression
-
-
-
-Used to capture nonlinear relationships between time/device features and energy consumption.
-
-
-
-\### 3. Improved Random Forest Regression
-
-
-
-The model was enhanced with cyclic time features such as `hour\_sin`, `hour\_cos`, `month\_sin`, and `month\_cos`.
-
-
-
-\---
-
-
-
-\## 📈 Model Results
-
-
-
-The models were evaluated using a time-based train/test split.
-
-
-
-| Model                  |   MAE |  RMSE |        R² |
-
-| ---------------------- | ----: | ----: | --------: |
-
-| Linear Regression      | 1.693 | 1.886 |     0.139 |
-
-| Random Forest          | 0.516 | 1.186 |     0.660 |
-
-| Improved Random Forest | 0.547 | 1.138 | \*\*0.686\*\* |
-
-
-
-The improved Random Forest achieved an \*\*R² of 0.686\*\* on the test set.
-
-
-
-\### Evaluation metrics
-
-
-
-\*\*MAE — Mean Absolute Error\*\*
-
-
-
-Measures the average absolute difference between actual and predicted energy consumption.
-
-
-
-\*\*RMSE — Root Mean Squared Error\*\*
-
-
-
-Penalizes larger prediction errors more strongly.
-
-
-
-\*\*R² — R-squared\*\*
-
-
-
-Measures how much of the variation in the target is explained by the model.
-
-
-
-\---
-
-
-
-\## 💡 Energy Optimization
-
-
-
-The predicted energy consumption was used to classify test periods into:
-
-
-
-\* \*\*Normal lighting\*\*
-
-\* \*\*Reduce/DIM lighting\*\*
-
-
-
-\### Test-set classification
-
-
-
-| Recommendation      | Periods |
-
-| ------------------- | ------: |
-
-| Normal lighting     |     700 |
-
-| Reduce/DIM lighting |     263 |
-
-| Total               |     963 |
-
-
-
-Approximately \*\*27.3% of the test periods\*\* received a Reduce/DIM recommendation.
-
-
-
-\### Potential energy-saving scenario
-
-
-
-A hypothetical scenario was created where Reduce/DIM periods consume \*\*20% less energy\*\*.
-
-
-
-Under this assumption:
-
-
-
-```text
-
-Estimated potential saving = 264.66 kWh
-
-```
-
-
-
-> \*\*Note:\*\* This is a scenario-based estimate, not measured real-world savings. Actual savings would depend on the lighting-control system, dimming level, operating conditions, and hardware capabilities.
-
-
-
-\---
-
-
-
-\## 🖥️ Streamlit Application
-
-
-
-The trained Random Forest model was saved and integrated into a Streamlit application.
-
-
-
-The application allows a user to enter:
-
-
-
-\* Hour
-
-\* Day
-
-\* Month
-
-\* Day of week
-
-\* Device ID
-
-
-
-The application then:
-
-
-
-```text
-
-User Input
-
-&#x20;   ↓
-
-Feature Generation
-
-&#x20;   ↓
-
-Saved Random Forest Model
-
-&#x20;   ↓
-
+Raw Energy Meter Data
+        ↓
+Data Loading
+        ↓
+Data Cleaning
+        ↓
+Handle Meter Resets
+        ↓
+Energy Consumption Calculation
+        ↓
+Outlier Detection
+        ↓
+Feature Engineering
+        ↓
+Exploratory Data Analysis
+        ↓
+Train/Test Split
+        ↓
+Model Training
+        ↓
+Model Evaluation
+        ↓
 Energy Prediction
-
-&#x20;   ↓
-
+        ↓
 Lighting Recommendation
-
 ```
 
+---
 
+## 🧹 Data Preprocessing
 
-\### Example prediction
+The following preprocessing steps were performed:
 
+* Combined multiple energy meter CSV files
+* Converted timestamps into datetime format
+* Sorted data chronologically
+* Calculated energy consumption from meter differences
+* Removed invalid negative consumption values
+* Handled outliers using the IQR method
+* Created time-based features
 
+---
+
+## ⚙️ Feature Engineering
+
+The following features were created from the timestamp:
+
+* `hour`
+* `day`
+* `month`
+* `day_of_week`
+* `is_weekend`
+
+Cyclic features were also created to represent the circular nature of time:
+
+* `hour_sin`
+* `hour_cos`
+* `month_sin`
+* `month_cos`
+
+These features help the model understand patterns such as daily and monthly energy consumption cycles.
+
+---
+
+## 🤖 Machine Learning Models
+
+### 1. Linear Regression
+
+Used as the baseline machine learning model.
+
+### 2. Random Forest Regression
+
+A Random Forest model was trained to capture nonlinear relationships between time/device features and energy consumption.
+
+### 3. Improved Random Forest
+
+The model was improved using additional cyclic time features such as:
+
+* `hour_sin`
+* `hour_cos`
+* `month_sin`
+* `month_cos`
+
+---
+
+## 📊 Model Performance
+
+The models were evaluated using:
+
+* MAE — Mean Absolute Error
+* RMSE — Root Mean Squared Error
+* R² Score
+
+| Model                  |   MAE |  RMSE | R² Score |
+| ---------------------- | ----: | ----: | -------: |
+| Linear Regression      | ~1.69 | ~1.89 |    ~0.14 |
+| Random Forest          | ~0.52 | ~1.19 |    ~0.66 |
+| Improved Random Forest | ~0.55 | ~1.14 |    ~0.69 |
+
+The improved Random Forest model achieved an **R² score of approximately 0.69** on the test data.
+
+> These results are based on the available dataset and test split. Performance may vary on new or different streetlight datasets.
+
+---
+
+## 📈 Visualizations
+
+### Energy Consumption by Hour
+
+![Energy Consumption by Hour](visualizations/energy_by_hour.png)
+
+Shows how streetlight energy consumption varies throughout the day.
+
+---
+
+### Energy Consumption by Day
+
+![Energy Consumption by Day](visualizations/energy_by_day.png)
+
+Shows daily energy consumption patterns in the dataset.
+
+---
+
+### Actual vs Predicted Energy Consumption
+
+![Actual vs Predicted](visualizations/actual_vs_predicted.png)
+
+Compares actual energy consumption with predictions generated by the machine learning model.
+
+---
+
+### Feature Importance
+
+![Feature Importance](visualizations/feature_importance.png)
+
+Shows which features contributed most to the Random Forest model's predictions.
+
+---
+
+### Lighting Recommendations
+
+![Lighting Recommendations](visualizations/lighting_recommendations.png)
+
+Provides lighting recommendations based on predicted energy consumption.
+
+---
+
+## 💡 Lighting Optimization
+
+The project categorizes predicted energy consumption into different operating recommendations.
+
+Example:
 
 ```text
+Low Energy Consumption
+        ↓
+Normal Lighting
 
-Predicted Energy Consumption: 3.83 kWh
+Medium Energy Consumption
+        ↓
+Monitor / Optimize
 
-
-
-Recommendation:
-
-High energy consumption — Consider Reduce/DIM lighting.
-
+High Energy Consumption
+        ↓
+Reduce / DIM Lighting
 ```
 
+The recommendations are intended as a **data-driven optimization concept** rather than direct control of physical streetlights.
 
+---
 
-\---
+## 📊 Optimization Analysis
 
+A sample optimization analysis was performed using the model predictions.
 
+The test data included approximately:
 
-\## 📸 Screenshots
+* **700** normal-operation recommendations
+* **263** Reduce/DIM recommendations
 
+This means approximately **27% of the analyzed test observations** were identified for potential lighting reduction under the project's recommendation rules.
 
+> This does not mean that 27% electricity savings were achieved. It represents the proportion of observations classified for potential optimization.
 
-\### Streamlit Application
+A hypothetical 20% reduction scenario was also analyzed to estimate potential energy savings.
 
+> The estimated savings are a model-based scenario, not measured real-world savings.
 
+---
 
-Add your Streamlit screenshot here:
+## 🌐 Streamlit Application
 
+The project includes an interactive **Streamlit** application.
 
+The application allows users to enter streetlight-related information and obtain:
 
-```text
+* Predicted energy consumption
+* Energy consumption category
+* Lighting optimization recommendation
 
-screenshots/streamlit\_prediction.png
+### Run the application
 
-```
-
-
-
-!\[Streamlit Prediction](screenshots/streamlit\_prediction.png)
-
-
-
-\### Actual vs Predicted Energy
-
-
-
-Add your model visualization here:
-
-
-
-```text
-
-visualizations/actual\_vs\_predicted.png
-
-```
-
-
-
-!\[Actual vs Predicted](visualizations/actual\_vs\_predicted.png)
-
-
-
-> Create the `screenshots` and `visualizations` folders and place your screenshots/graphs inside them before pushing the final README update.
-
-
-
-\---
-
-
-
-\## 🛠️ Technologies Used
-
-
-
-\### Programming
-
-
-
-\* Python
-
-
-
-\### Data Analysis
-
-
-
-\* Pandas
-
-\* NumPy
-
-
-
-\### Visualization
-
-
-
-\* Matplotlib
-
-
-
-\### Machine Learning
-
-
-
-\* Scikit-learn
-
-\* Linear Regression
-
-\* Random Forest Regression
-
-
-
-\### Deployment
-
-
-
-\* Streamlit
-
-\* Joblib
-
-
-
-\### Development Environment
-
-
-
-\* Google Colab
-
-\* Visual Studio Code / PowerShell
-
-\* Git
-
-\* GitHub
-
-
-
-\---
-
-
-
-\## 📁 Project Structure
-
-
-
-```text
-
-streetlight-energy-optimizer/
-
-│
-
-├── data/
-
-│   └── Public lighting/
-
-│       ├── ENERGYMETER.csv
-
-│       ├── ENERGYMETER.csv
-
-│       ├── ENERGYMETER.csv
-
-│       └── ENERGYMETER.csv
-
-│
-
-├── notebooks/
-
-│   └── streetlight\_energy\_optimizer.ipynb
-
-│
-
-├── screenshots/
-
-│   └── streamlit\_prediction.png
-
-│
-
-├── visualizations/
-
-│   └── actual\_vs\_predicted.png
-
-│
-
-├── app.py
-
-├── model\_features.pkl
-
-├── streetlight\_energy\_model.pkl
-
-├── requirements.txt
-
-├── .gitignore
-
-└── README.md
-
-```
-
-
-
-> If the `.pkl` model files are excluded through `.gitignore`, they must be provided separately when deploying the application.
-
-
-
-\---
-
-
-
-\## 🚀 How to Run the Project
-
-
-
-\### 1. Clone the repository
-
-
+Install the required packages:
 
 ```bash
-
-git clone https://github.com/chari532/streetlight-energy-optimizer.git
-
-```
-
-
-
-\### 2. Open the project
-
-
-
-```bash
-
-cd streetlight-energy-optimizer
-
-```
-
-
-
-\### 3. Install dependencies
-
-
-
-```bash
-
 pip install -r requirements.txt
-
 ```
 
-
-
-\### 4. Make sure the model files are available
-
-
-
-The Streamlit application requires:
-
-
-
-```text
-
-streetlight\_energy\_model.pkl
-
-model\_features.pkl
-
-```
-
-
-
-Place these files in the project root directory.
-
-
-
-\### 5. Run the Streamlit application
-
-
+Run Streamlit:
 
 ```bash
-
 streamlit run app.py
-
 ```
 
+The application will open in your web browser.
 
+---
 
-\### 6. Open the application
+## 🛠️ Technologies Used
 
+### Programming
 
+* Python
 
-Streamlit will provide a local address similar to:
+### Data Analysis
 
+* Pandas
+* NumPy
 
+### Data Visualization
+
+* Matplotlib
+
+### Machine Learning
+
+* Scikit-learn
+* Linear Regression
+* Random Forest Regression
+
+### Application
+
+* Streamlit
+
+### Development Tools
+
+* Git
+* GitHub
+* Jupyter Notebook / Python
+
+---
+
+## 📁 Project Structure
 
 ```text
-
-http://localhost:8501
-
+Public lighting/
+│
+├── visualizations/
+│   ├── actual_vs_predicted.png
+│   ├── energy_by_day.png
+│   ├── energy_by_hour.png
+│   ├── feature_importance.png
+│   └── lighting_recommendations.png
+│
+├── a126ebe4-2cca-4cbb-953e-71eaca8ac837_ENERGYMETER.csv
+├── b9369849-86c9-4e7d-85c2-3f2c5c36b536_ENERGYMETER.csv
+├── de661529-15d0-4960-949d-ac2c736cb5b8_ENERGYMETER.csv
+├── ec958f72-79c0-41a8-8531-ce490d10977a_ENERGYMETER.csv
+│
+├── app.py
+├── generate_graphs.py
+├── model_features.pkl
+├── streetlight_energy_model.pkl
+├── requirements.txt
+├── README.md
+└── .gitignore
 ```
 
+---
 
+## 🔐 Git Ignore
 
-Open it in your browser.
+Large trained model files are excluded from Git tracking using `.gitignore`.
 
+```text
+*.pkl
+__pycache__/
+.venv/
+.env
+```
 
+This keeps the GitHub repository smaller while the model files can be maintained locally.
 
-\---
+---
 
-
-
-\## 🔮 Future Improvements
-
-
-
-Possible future improvements include:
-
-
-
-\* Add real-time streetlight sensor data
-
-\* Include weather information
-
-\* Include traffic/vehicle activity
-
-\* Include ambient light or sunlight information
-
-\* Add automatic dimming-control integration
-
-\* Add device-level monitoring
-
-\* Add daily/monthly energy dashboards
-
-\* Add electricity-cost estimation
-
-\* Compare multiple Machine Learning algorithms
-
-\* Deploy the application to a cloud platform
-
-\* Add automated model retraining
-
-
-
-\---
-
-
-
-\## 🎓 Skills Demonstrated
-
-
+## 📌 Key Skills Demonstrated
 
 This project demonstrates practical experience in:
 
+* Python Programming
+* Data Cleaning
+* Data Preprocessing
+* Exploratory Data Analysis
+* Feature Engineering
+* Time-Series Feature Extraction
+* Machine Learning
+* Regression
+* Random Forest
+* Model Evaluation
+* Data Visualization
+* Streamlit
+* Git & GitHub
 
+---
 
-\* Python programming
+## 🔮 Future Improvements
 
-\* Data preprocessing
+Possible future improvements include:
 
-\* Exploratory Data Analysis
+* Real-time IoT sensor integration
+* Real-time energy monitoring
+* Weather data integration
+* Traffic and pedestrian activity data
+* Automatic dimming control
+* Time-series forecasting models
+* XGBoost / LightGBM comparison
+* Cloud deployment
+* Smart city dashboard
+* Automated alerts for abnormal energy consumption
 
-\* Time-based feature engineering
+---
 
-\* Feature encoding
+## 🌍 Real-World Applications
 
-\* Regression Machine Learning
+This project can be extended for:
 
-\* Random Forest
+* Smart city infrastructure
+* Municipal street lighting
+* Energy management systems
+* Smart grids
+* IoT-based streetlight networks
+* Electricity consumption monitoring
+* Sustainable city projects
 
-\* Model evaluation
+---
 
-\* Data visualization
+## 👨‍💻 Author
 
-\* Energy optimization logic
+**Rachakonda Siva Naga Brahmachari**
 
-\* Model serialization
-
-\* Streamlit application development
-
-\* Git and GitHub
-
-
-
-\---
-
-
-
-\## 👨‍💻 Author
-
-
-
-\*\*R Siva\*\*
-
-
-
-B.Tech — Electrical \& Electronics Engineering
-
-
+B.Tech – Electrical & Electronics Engineering
 
 Interested in:
 
+* Artificial Intelligence
+* Machine Learning
+* Data Science
+* Data Analytics
 
+---
 
-\* Data Science
+## 🔗 Project Repository
 
-\* Machine Learning
+GitHub:
 
-\* Artificial Intelligence
+https://github.com/chari532/streetlight-energy-optimizer
 
-\* Data Analytics
+---
 
-
-
-\---
-
-
-
-\## ⭐ Project Highlights
-
-
+## ⭐ Project Highlights
 
 ```text
-
-✔ Real-world public energy dataset
-
-✔ 4,958 raw records
-
-✔ 4 streetlight devices
-
-✔ 4,814 records after cleaning
-
-✔ Multiple ML models compared
-
-✔ Improved Random Forest R² = 0.686
-
-✔ 263 high-consumption test periods identified
-
-✔ Streamlit prediction application
-
-✔ GitHub-ready Machine Learning project
-
+Real-world Dataset
+        +
+Data Cleaning
+        +
+Feature Engineering
+        +
+Machine Learning
+        +
+Data Visualization
+        +
+Streamlit Application
+        =
+Streetlight Energy Optimizer
 ```
 
-
-
+If you find this project useful, consider giving the repository a ⭐ on GitHub.
