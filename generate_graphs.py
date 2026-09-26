@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 os.makedirs("visualizations", exist_ok=True)
 
 
-folder = "/content"
+folder = os.path.dirname(os.path.abspath(__file__))
 
 files = glob.glob(
     os.path.join(
